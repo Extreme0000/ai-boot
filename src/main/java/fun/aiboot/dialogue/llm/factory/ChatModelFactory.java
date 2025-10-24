@@ -5,6 +5,7 @@ import fun.aiboot.dialogue.llm.tool.ToolsGlobalRegistry;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,18 +15,20 @@ public class ChatModelFactory {
     private ToolCallingManager toolCallingManager;
     @Autowired
     private ToolsGlobalRegistry toolsGlobalRegistry;
+    @Value("${spring.ai.dashscope.api-key}")
+    private String apiKey;
 
     // 使用工厂模式创建模型实例，预留可扩展
     public ChatModel takeChatModel(ModelFrameworkType modelFrameworkType) {
         return switch (modelFrameworkType) {
             case dashscope -> DashscopeModel.builder()
-                    .apiKey(System.getenv("DASHSCOPE_API_KEY"))
+                    .apiKey(apiKey)
                     .modelName("qwen3-max")
                     .toolCallingManager(toolCallingManager)
                     .toolsGlobalRegistry(toolsGlobalRegistry)
                     .build();
             default -> DashscopeModel.builder()
-                    .apiKey(System.getenv("DASHSCOPE_API_KEY"))
+                    .apiKey(apiKey)
                     .modelName("qwen-plus")
                     .toolCallingManager(null)
                     .build();

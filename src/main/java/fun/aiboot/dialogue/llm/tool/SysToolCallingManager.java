@@ -151,7 +151,6 @@ public class SysToolCallingManager implements ToolCallingManager {
         // 创建工具响应
         List<ToolResponseMessage.ToolResponse> toolResponses = new ArrayList<>();
         for (AssistantMessage.ToolCall toolCall : assistantMessage.getToolCalls()) {
-            log.debug("执行工具调用: {}", toolCall.name());
 
             String toolName = toolCall.name();
             String toolInputArguments = toolCall.arguments();
@@ -184,7 +183,7 @@ public class SysToolCallingManager implements ToolCallingManager {
                         observationContext.setToolCallResult(toolResult);
                         return toolResult;
                     });
-
+            log.info("工具 [{}] 调用结果: {}", toolName, toolCallResult);
             toolResponses.add(new ToolResponseMessage.ToolResponse(toolCall.id(), toolName,
                     toolCallResult != null ? toolCallResult : ""));
         }
