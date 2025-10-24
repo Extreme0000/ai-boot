@@ -10,10 +10,12 @@
     </parent>
 
     <groupId>org.example</groupId>
-    <artifactId>xiao-ai-esp32</artifactId>
+    <artifactId>ai-boot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>xiao-ai-esp32</name>
-    <description>xiao-ai-esp32</description>
+    <name>ai-boot</name>
+    <description>
+        重构后的Spring AI
+    </description>
 
     <properties>
         <java.version>21</java.version>
