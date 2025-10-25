@@ -61,9 +61,25 @@ public class LLMService {
         return text;
     }
 
-    public Flux<ChatResponse> stream(String userId, String message) {
+    public Flux<String> stream(String userId, String message) {
         Prompt prompt = buildPrompt(userId, message);
-        return chatModel.stream(prompt);
+
+        // 使用 StringBuilder 收集完整响应
+        StringBuilder completeResponse = new StringBuilder();
+
+        return chatModel.stream(prompt)
+                .map(chatResponse -> {
+                    // 提取当前片段的文本
+                    String chunk = chatResponse.getResult().getOutput().getText();
+                    chunk = StringUtils.isBlank(chunk) ? "" : chunk;
+                    // 收集到完整响应中
+                    completeResponse.append(chunk);
+                    return chunk;
+                })
+                .doOnComplete(() -> {
+                    // 流完成后保存历史记录
+                    addHistory(userId, message, completeResponse.toString());
+                });
     }
 
     public Map<String, ToolCallback> getAllFunctions() {
