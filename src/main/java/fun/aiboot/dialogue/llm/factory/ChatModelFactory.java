@@ -2,37 +2,25 @@ package fun.aiboot.dialogue.llm.factory;
 
 import fun.aiboot.dialogue.llm.providers.DashscopeModel;
 import fun.aiboot.dialogue.llm.tool.ToolsGlobalRegistry;
+import lombok.Builder;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
+@Builder
 public class ChatModelFactory {
 
-    @Autowired
     private ToolCallingManager toolCallingManager;
-    @Autowired
     private ToolsGlobalRegistry toolsGlobalRegistry;
-    @Value("${spring.ai.dashscope.api-key}")
     private String apiKey;
+    private String modelName;
 
     // 使用工厂模式创建模型实例，预留可扩展
     public ChatModel takeChatModel(ModelFrameworkType modelFrameworkType) {
-        return switch (modelFrameworkType) {
-            case dashscope -> DashscopeModel.builder()
-                    .apiKey(apiKey)
-                    .modelName("qwen3-max")
-                    .toolCallingManager(toolCallingManager)
-                    .toolsGlobalRegistry(toolsGlobalRegistry)
-                    .build();
-            default -> DashscopeModel.builder()
-                    .apiKey(apiKey)
-                    .modelName("qwen-plus")
-                    .toolCallingManager(null)
-                    .build();
-        };
+        return DashscopeModel.builder()
+                .apiKey(apiKey)
+                .modelName(modelName)
+                .toolCallingManager(toolCallingManager)
+                .toolsGlobalRegistry(toolsGlobalRegistry)
+                .build();
     }
-
 }
