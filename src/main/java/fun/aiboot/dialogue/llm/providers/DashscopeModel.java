@@ -10,6 +10,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -52,6 +53,11 @@ public class DashscopeModel implements ChatModel {
     @Override
     public ChatResponse call(Prompt prompt) {
         return dashScopeChatModel.call(prompt);
+    }
+
+    @Override
+    public Flux<ChatResponse> stream(Prompt prompt) {
+        return dashScopeChatModel.stream(prompt);
     }
 
 
