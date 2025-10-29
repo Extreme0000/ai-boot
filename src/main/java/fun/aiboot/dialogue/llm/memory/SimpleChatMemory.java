@@ -20,8 +20,9 @@ public class SimpleChatMemory implements ChatMemory {
         } else {
             messages.add(content);
         }
-
+        System.out.println("==================================================================================================");
         memory.forEach((key, value) -> System.out.println("UserId: " + key + " Messages: " + value));
+        System.out.println("==================================================================================================");
     }
 
     @Override

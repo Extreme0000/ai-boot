@@ -6,7 +6,6 @@ import fun.aiboot.communication.server.MessageHandler;
 import fun.aiboot.communication.server.MessagePublisher;
 import fun.aiboot.dialogue.llm.LLMService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

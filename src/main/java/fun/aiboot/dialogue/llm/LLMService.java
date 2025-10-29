@@ -3,9 +3,11 @@ package fun.aiboot.dialogue.llm;
 import fun.aiboot.dialogue.llm.factory.ChatModelFactory;
 import fun.aiboot.dialogue.llm.factory.ModelFrameworkType;
 import fun.aiboot.dialogue.llm.memory.ChatMemory;
-import fun.aiboot.dialogue.llm.memory.SimpleChatMemory;
+import fun.aiboot.dialogue.llm.memory.ElasticsearchChatMemory;
+import fun.aiboot.dialogue.llm.memory.MySQLChatMemory;
 import fun.aiboot.dialogue.llm.tool.ToolsGlobalRegistry;
 import io.micrometer.common.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -22,6 +24,7 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class LLMService {
     private final ChatModelFactory chatModelFactory;
@@ -29,13 +32,18 @@ public class LLMService {
     private final ChatMemory chatMemory;
     private final ChatModel chatModel;
     private final ToolsGlobalRegistry toolsGlobalRegistry;
+
     @Value("${spring.ai.dashscope.limit:10}")
     Integer limit;
 
     public LLMService(ToolCallingManager toolCallingManager,
                       ToolsGlobalRegistry toolsGlobalRegistry,
                       @Value("${spring.ai.dashscope.api-key}") String apiKey,
-                      @Value("${spring.ai.dashscope.model-name}") String modelName) {
+                      @Value("${spring.ai.dashscope.model-name}") String modelName,
+                      @Value("${chat.memory.type:mysql}") String memoryType,
+                      MySQLChatMemory mySQLChatMemory,
+                      ElasticsearchChatMemory elasticsearchChatMemory
+    ) {
         Assert.notNull(apiKey, "apiKey cannot be null");
         Assert.notNull(modelName, "modelName cannot be null");
 
@@ -46,7 +54,16 @@ public class LLMService {
                 .apiKey(apiKey)
                 .build();
         this.toolsGlobalRegistry = toolsGlobalRegistry;
-        this.chatMemory = new SimpleChatMemory();
+
+        // 根据配置选择 Memory 实现
+        if ("elasticsearch".equalsIgnoreCase(memoryType)) {
+            this.chatMemory = elasticsearchChatMemory;
+            log.info("Using Elasticsearch Chat Memory with vector search");
+        } else {
+            this.chatMemory = mySQLChatMemory;
+            log.info("Using MySQL Chat Memory");
+        }
+
         this.chatModel = chatModelFactory.takeChatModel(ModelFrameworkType.dashscope);
     }
 
