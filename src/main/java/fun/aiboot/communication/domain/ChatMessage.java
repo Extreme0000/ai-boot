@@ -16,9 +16,21 @@ public final class ChatMessage extends BaseMessage {
     }
 
     private String from;
-    private String to;
     private String content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime time;
     private String msgType;
+
+    public ChatMessage(String from, String content, LocalDateTime time, String msgType) {
+        super("chat");
+        this.from = from;
+        this.content = content;
+        this.time = time;
+        this.msgType = msgType;
+    }
+
+    private String messageId;  // 消息唯一标识
+    private Boolean isStreaming; // 是否是流式消息
+    private Boolean isComplete;  // 流是否完成
+
 }

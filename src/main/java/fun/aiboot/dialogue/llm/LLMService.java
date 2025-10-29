@@ -3,7 +3,6 @@ package fun.aiboot.dialogue.llm;
 import fun.aiboot.dialogue.llm.factory.ChatModelFactory;
 import fun.aiboot.dialogue.llm.factory.ModelFrameworkType;
 import fun.aiboot.dialogue.llm.memory.ChatMemory;
-import fun.aiboot.dialogue.llm.memory.SimpleChatMemory;
 import fun.aiboot.dialogue.llm.tool.ToolsGlobalRegistry;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -34,6 +33,7 @@ public class LLMService {
 
     public LLMService(ToolCallingManager toolCallingManager,
                       ToolsGlobalRegistry toolsGlobalRegistry,
+                      ChatMemory chatMemory,
                       @Value("${spring.ai.dashscope.api-key}") String apiKey,
                       @Value("${spring.ai.dashscope.model-name}") String modelName) {
         Assert.notNull(apiKey, "apiKey cannot be null");
@@ -46,7 +46,7 @@ public class LLMService {
                 .apiKey(apiKey)
                 .build();
         this.toolsGlobalRegistry = toolsGlobalRegistry;
-        this.chatMemory = new SimpleChatMemory();
+        this.chatMemory = chatMemory;
         this.chatModel = chatModelFactory.takeChatModel(ModelFrameworkType.dashscope);
     }
 

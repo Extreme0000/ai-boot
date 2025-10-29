@@ -6,12 +6,12 @@ import fun.aiboot.communication.server.MessageHandler;
 import fun.aiboot.communication.server.MessagePublisher;
 import fun.aiboot.dialogue.llm.LLMService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -40,32 +40,54 @@ public class ChatService implements MessageHandler {
         ChatMessage msg = (ChatMessage) message;
         Flux<String> stream = llmService.stream(userId, msg.getContent());
 
-        // 使用 StringBuilder 收集流式响应
+        // 生成唯一消息ID
+        String messageId = UUID.randomUUID().toString();
         StringBuilder responseBuilder = new StringBuilder();
 
-        // 订阅流并处理每个响应片段
         stream.subscribe(
                 chunk -> {
                     responseBuilder.append(chunk);
-                    // 发送流式响应片段给用户
+                    // 发送流式响应片段
                     ChatMessage chatMessage = new ChatMessage(
-                            msg.getFrom(),
-                            msg.getTo(),
-                            chunk,  // 发送当前片段
+                            "AI Assistant",  // 或者从配置读取
+                            responseBuilder.toString(),  // 发送累积的完整内容
                             LocalDateTime.now(),
                             "text"
                     );
+                    chatMessage.setMessageId(messageId);
+                    chatMessage.setIsStreaming(true);
+                    chatMessage.setIsComplete(false);
                     messagePublisher.sendToUser(userId, chatMessage);
                 },
                 error -> {
-                    // 处理错误情况
-                    System.err.println("Error in streaming: " + error.getMessage());
+                    log.error("Error in streaming: {}", error.getMessage());
+                    // 发送错误消息
+                    ChatMessage errorMessage = new ChatMessage(
+                            "System",
+                            "抱歉，消息发送失败：" + error.getMessage(),
+                            LocalDateTime.now(),
+                            "system"
+                    );
+                    errorMessage.setMessageId(messageId);
+                    errorMessage.setIsComplete(true);
+                    messagePublisher.sendToUser(userId, errorMessage);
                 },
                 () -> {
-                    // 流完成后的处理（可选）
                     log.info("Stream completed 响应：\n{}", responseBuilder);
+                    // 发送完成标记
+                    ChatMessage completeMessage = new ChatMessage(
+                            "AI Assistant",
+                            responseBuilder.toString(),
+                            LocalDateTime.now(),
+                            "text"
+                    );
+                    completeMessage.setMessageId(messageId);
+                    completeMessage.setIsStreaming(false);
+                    completeMessage.setIsComplete(true);
+                    messagePublisher.sendToUser(userId, completeMessage);
                 }
         );
     }
+
 
 }
