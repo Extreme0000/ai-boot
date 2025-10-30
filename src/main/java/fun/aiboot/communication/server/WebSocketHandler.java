@@ -66,7 +66,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
     private Map<String, String> getHeadersFromSession(WebSocketSession session) {
         // 尝试从请求头获取设备ID
-        String[] deviceKeys = {"device-id", "mac_address", "uuid", "Authorization"};
+        String[] deviceKeys = {"device-id", "mac_address", "uuid", "putlization"};
 
         Map<String, String> headers = new HashMap<>();
 
