@@ -1,7 +1,7 @@
 package fun.aiboot.service;
 
-import fun.aiboot.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import fun.aiboot.entity.User;
 
 /**
  * <p>
@@ -13,4 +13,18 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface UserService extends IService<User> {
 
+    // 登录
+    String login(String username, String password);
+
+    // 注册
+    void register(String username, String password, String email);
+
+    // 修改密码
+    void updatePassword(String username, String oldPassword, String newPassword);
+
+    // 忘记密码
+    void forgetPassword(String username, String email);
+
+    // 获取用户信息
+    User getUserInfo(String id);
 }
