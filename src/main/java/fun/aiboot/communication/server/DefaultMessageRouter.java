@@ -26,6 +26,10 @@ public class DefaultMessageRouter implements MessageRouter {
     public void route(String userId, String rawMessage) {
         try {
             // 解析消息结构
+            if (rawMessage.equals("ping")) {
+                log.info("收到ping消息");
+                return;
+            }
 
             var base = JSON.to(BaseMessage.class, rawMessage);
             String type = base.getType();

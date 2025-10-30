@@ -9,22 +9,31 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class MySQLChatMemory implements ChatMemory {
+
+    private final Map<String, Message> memory = new HashMap<>();
+
     @Resource
     private ChatMapper chatMapper;
+
     @Override
     public void addMessage(String userId, Message content) {
+        memory.put(userId, content);
         if (content instanceof UserMessage userMessage) {
             chatMapper.insert(Chat.builder()
-                    .from("user")
+                    .fromUser("user")
                     .content(userMessage.getText())
                     .build());
         } else if (content instanceof AssistantMessage assistantMessage) {
+            // 总结内容
+            String text = assistantMessage.getText();
             chatMapper.insert(Chat.builder()
-                    .from("assistant")
+                    .fromUser("assistant")
                     .content(assistantMessage.getText())
                     .build());
         } else {

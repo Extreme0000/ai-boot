@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Chat {
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
-    private String from;
+    private String fromUser;
     private String content;
     private LocalDateTime createTime;
 }
