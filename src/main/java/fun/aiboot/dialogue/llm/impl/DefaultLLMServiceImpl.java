@@ -1,9 +1,14 @@
 package fun.aiboot.dialogue.llm.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import fun.aiboot.context.UserContextHolder;
 import fun.aiboot.dialogue.llm.LLMService;
+import fun.aiboot.dialogue.llm.factory.ChatModelFactory;
+import fun.aiboot.dialogue.llm.factory.ModelFrameworkType;
 import fun.aiboot.dialogue.llm.memory.ChatMemory;
 import fun.aiboot.dialogue.llm.tool.ToolsGlobalRegistry;
+import fun.aiboot.entity.Model;
+import fun.aiboot.service.ModelService;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -12,6 +17,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,21 +32,37 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultLLMServiceImpl implements LLMService {
     private final ChatMemory chatMemory;
     private final ToolsGlobalRegistry toolsGlobalRegistry;
+    private final ModelService modelService;
+    private final ToolCallingManager toolCallingManager;
     Map<String, ChatModel> chatModelMap = new ConcurrentHashMap<>();
+
 
     /**
      * 初始化模型
      */
     @PostMapping
-    public String init() {
-
-
+    public void init() {
+        List<Model> models = modelService.getBaseMapper().selectList(Wrappers.lambdaQuery(Model.class));
+        for (Model model : models) {
+            ChatModel chatModel = ChatModelFactory.builder()
+                    .modelName(model.getName())
+                    .toolCallingManager(toolCallingManager)
+                    .toolsGlobalRegistry(toolsGlobalRegistry)
+                    .apiKey(model.getModelKey())
+                    .build()
+                    .takeChatModel(ModelFrameworkType.dashscope);
+            chatModelMap.put(model.getId(), chatModel);
+        }
     }
 
 
-    public DefaultLLMServiceImpl(ToolsGlobalRegistry toolsGlobalRegistry, ChatMemory chatMemory) {
+    public DefaultLLMServiceImpl(ToolCallingManager toolCallingManager,
+                                 ToolsGlobalRegistry toolsGlobalRegistry,
+                                 ChatMemory chatMemory, ModelService modelService) {
         this.toolsGlobalRegistry = toolsGlobalRegistry;
         this.chatMemory = chatMemory;
+        this.modelService = modelService;
+        this.toolCallingManager = toolCallingManager;
     }
 
     @Override

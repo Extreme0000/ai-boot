@@ -46,6 +46,12 @@ public class Model implements Serializable {
     private String provider;
 
     /**
+     * 模型密钥
+     */
+    @TableField("model_key")
+    private String modelKey;
+
+    /**
      * 最大token数
      */
     @TableField("max_tokens")
