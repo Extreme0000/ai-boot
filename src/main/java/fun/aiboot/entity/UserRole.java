@@ -26,8 +26,6 @@ import java.io.Serializable;
 @TableName("user_role")
 public class UserRole implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */

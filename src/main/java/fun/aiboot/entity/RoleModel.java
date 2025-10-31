@@ -23,8 +23,6 @@ import lombok.experimental.Accessors;
 @TableName("role_model")
 public class RoleModel implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * id
      */

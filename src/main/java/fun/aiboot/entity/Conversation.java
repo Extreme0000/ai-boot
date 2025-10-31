@@ -27,8 +27,6 @@ import java.time.LocalDateTime;
 @TableName("conversation")
 public class Conversation implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 会话ID
      */

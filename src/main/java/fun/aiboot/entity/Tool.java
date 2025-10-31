@@ -27,8 +27,6 @@ import java.time.LocalDateTime;
 @TableName("tool")
 public class Tool implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 工具ID
      */

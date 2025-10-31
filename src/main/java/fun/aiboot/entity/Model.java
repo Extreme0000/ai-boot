@@ -27,8 +27,6 @@ import java.time.LocalDateTime;
 @TableName("model")
 public class Model implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 模型ID
      */
