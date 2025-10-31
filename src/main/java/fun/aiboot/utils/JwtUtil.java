@@ -1,5 +1,7 @@
 package fun.aiboot.utils;
 
+import com.alibaba.fastjson2.JSON;
+import fun.aiboot.context.UserContext;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,13 +24,15 @@ public class JwtUtil {
 
     /**
      * 生成JWT令牌
-     * @param claims JWT第二部分负载 payload 中存储的内容
+     *
+     * @param userContext JWT第二部分负载 payload 中存储的内容
      * @return
      */
-    public static String generateJwt(Map<String, Object> claims){
-        log.info("生成JWT令牌：{}", claims);
+    public static String generateJwt(UserContext userContext) {
+        log.info("{} 生成JWT令牌：{}", userContext.getUsername(), userContext.getRoles());
+        Map<String, Object> map = JSON.parseObject(JSON.toJSONString(userContext), Map.class);
         return Jwts.builder()
-                .addClaims(claims)
+                .addClaims(map)
                 .signWith(getSigningKey()) // 使用新的签名方法
                 .setExpiration(new Date(System.currentTimeMillis() + expire))
                 .compact();
@@ -36,13 +40,15 @@ public class JwtUtil {
 
     /**
      * 解析JWT令牌
+     *
      * @param jwt JWT令牌
      * @return JWT第二部分负载 payload 中存储的内容
      */
-    public static Claims parseJWT(String jwt){
-        return Jwts.parser()
+    public static UserContext parseJWT(String jwt) {
+        Claims body = Jwts.parser()
                 .setSigningKey(getSigningKey()) // 使用新的解析方式
                 .parseClaimsJws(jwt)
                 .getBody();
+        return JSON.parseObject(JSON.toJSONString(body), UserContext.class);
     }
 }

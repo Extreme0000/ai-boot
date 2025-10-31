@@ -1,12 +1,16 @@
 package fun.aiboot.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -16,6 +20,7 @@ import lombok.experimental.Accessors;
  * @author putl
  * @since 2025-10-30
  */
+@Builder
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -25,9 +30,9 @@ public class Role implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 角色
+     * 角色ID
      */
-    @TableField("id")
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
 
     /**

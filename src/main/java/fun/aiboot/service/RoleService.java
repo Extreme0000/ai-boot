@@ -13,4 +13,7 @@ import fun.aiboot.entity.Role;
  */
 public interface RoleService extends IService<Role> {
 
+    // 创建角色
+    void createRole(Role role);
+
 }
